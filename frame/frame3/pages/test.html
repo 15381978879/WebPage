@@ -1,38 +1,52 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Pagination 分页表格</title>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" /><link href="../../../res/css/demo.css" rel="stylesheet" type="text/css" />
 
+
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" /><link href="../../../res/css/demo.css" rel="stylesheet" type="text/css" />
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="../../../scripts/boot.js" type="text/javascript"></script>
     <script src="../../../scripts/ColumnsMenu.js" type="text/javascript"></script>
 
 </head>
-<body >
-<h1>Pagination 分页表格</h1>
+<body onload="ss()">
 
-<div style="padding-bottom:5px;">
+<div style="width:800px;">
+    <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+        <table style="width:100%;">
+            <tr>
+                <td style="width:100%;">
+                    <a class="mini-button" iconCls="icon-add" onclick="add()">增加</a>
+                    <a class="mini-button" iconCls="icon-add" onclick="edit()">编辑</a>
 
-    <span>员工姓名：</span><input type="text" id="key"  />
-    <input type="button" value="查找" onclick="search()"/>
-
+                </td>
+                <td style="white-space:nowrap;">
+                    <input id="key" type="text" class="mini-textbox" emptyText="请输入姓名" style="width:150px;" onenter="onKeyEnter"/>
+                    <a class="mini-button" onclick="search()">查询</a>
+                </td>
+            </tr>
+        </table>
+    </div>
 </div>
 
-<div id="datagrid1" class="mini-datagrid" style="width:100%;height:250px;"
-     url="../data/AjaxService.aspx?method=SearchEmployees"
-     idField="id" allowResize="true"
-     sizeList="[20,30,50,100]" pageSize="20"
-     showHeader="true" title="表格面板"
-     onmouseup="return datagrid1_onmouseup()">
+
+<!--<div id="datagrid1" class="mini-datagrid" style="width:100%;height:250px;"-->
+     <!--idField="id" allowResize="true"-->
+     <!--sizeList="[20,30,50,100]" pageSize="20"-->
+     <!--showHeader="true" title="表格面板">-->
+<div id="userGrid" class="mini-datagrid" style="height:380px;" allowResize="true" sizelist="[2,4,6,8]" pagesize="6"
+         allowcellselect="true" multiselect="true">
     <div property="columns">
+        <div type="checkcolumn" ></div>
         <div type="indexcolumn" ></div>
-        <div field="loginname" width="120" headerAlign="center" allowSort="true">员工帐号</div>
-        <div field="name" width="120" headerAlign="center" allowSort="true">姓名</div>
-        <div field="gender" width="100" renderer="onGenderRenderer" align="center" headerAlign="center">性别</div>
-        <div field="salary" numberFormat="¥#,0.00" align="right" width="100" allowSort="true">薪资</div>
-        <div field="age" width="100" allowSort="true" decimalPlaces="2" dataType="float">年龄</div>
-        <div field="createtime" width="100" headerAlign="center" dateFormat="yyyy-MM-dd" allowSort="true">创建日期</div>
+        <div field="uuid" width="120" headerAlign="center" allowSort="true" align="center">uuid</div>
+        <div field="username" width="120" headerAlign="center" allowSort="true" align="center">用户名</div>
+        <div field="password" width="100"  align="center" headerAlign="center">密码</div>
+        <div field="nickname" width="100"  align="center" headerAlign="center">昵称</div>
+        <div field="roleid"   width="100" headerAlign="center" renderer="onGenderRenderer" allowSort="true" align="center">角色</div>
+        <div field="status" width="100" headerAlign="center" renderer="onStatusRenderer"  allowSort="true" align="center">状态</div>
     </div>
 </div>
 
@@ -40,43 +54,124 @@
 
 
 <script type="text/javascript">
-
     mini.parse();
+    var grid = mini.get("userGrid");
 
-    var grid = mini.get("datagrid1");
+    function edit() {
 
-    grid.load();
+        var row = grid.getSelected();
+        if (row) {
+            mini.open({
+                targetWindow: window,
 
-    var menu = new ColumnsMenu(grid);
+                url: "EmployeeWindow.html",
+                title: "编辑员工", width: 600, height: 400,
+                onload: function () {
+                    var iframe = this.getIFrameEl();
+                    var data = { action: "edit", uuid: row.uuid, username: row.username,
+                    password: row.password, nickname: row.nickname ,roleid: row.roleid,status: row.status };
+                    iframe.contentWindow.SetData(data);
+
+                },
+                ondestroy: function (action) {
+                    ss();
+                    //var iframe = this.getIFrameEl();
+
+                    //grid.reload();
+
+                }
+            });
+
+        } else {
+            alert("请选中一条记录");
+        }
+
+    }
+
+    function add() {
+
+        mini.open({
+            targetWindow: window,
+
+            url: "EmployeeWindow.html",
+            title: "新增员工", width: 600, height: 400,
+            onload: function () {
+                var iframe = this.getIFrameEl();
+                var data = { action: "new" };
+                iframe.contentWindow.SetData(data);
+            },
+            ondestroy: function (action) {
+                console.log('des')
+                // grid.reload();
+                ss();
+            }
+        });
+    }
+
+
 
     function search() {
-        var key = document.getElementById("key").value;
-        grid.load({ key: key});
-    }
-    $("#key").bind("keydown", function (e) {
-        if (e.keyCode == 13) {
-            search();
+        console.log('查询用户');
+        //var grid = mini.get("datagrid1");
+        var requestData = {
+            nickname:mini.get("#key").getValue(),
         }
-    });
-    ///////////////////////////////////////////////////////
-    var Genders = [{ id: 1, text: '男' }, { id: 2, text: '女'}];
+        $.ajax({
+            url: "http://localhost:8081/SelectByName",
+            type: "post",
+            data: JSON.stringify(requestData),
+            dataType: "json",
+            contentType : "application/json;charset=utf-8",
+
+            success: function(dt){
+                console.log(dt)
+                grid.setData(dt)
+
+            }
+        })
+    }
+
+    function ss(){
+        console.log('取列表数据');
+        // var grid = mini.get("datagrid1");
+
+        $.ajax({
+            url: "http://localhost:8081/SelectAllUser",
+            type: "post",
+            dataType: "json",
+            contentType : "application/json;charset=utf-8",
+
+            success: function(dt){
+                console.log(dt)
+                grid.setData(dt)
+                sessionStorage.setItem("UsersList",JSON.stringify(dt));
+
+            }
+        })
+    }
+    var Genders = [{ id: 1, text: '管理员' }, { id: 2, text: '团长'},{ id: 3, text: '医生'}];
     function onGenderRenderer(e) {
         for (var i = 0, l = Genders.length; i < l; i++) {
             var g = Genders[i];
             if (g.id == e.value) return g.text;
         }
         return "";
+    }var Status = [{ id: 0, text: '停用' }, { id: 1, text: '正常'}];
+    function onStatusRenderer(e) {
+        for (var i = 0, l = Status.length; i < l; i++) {
+            var g = Status[i];
+            if (g.id == e.value) return g.text;
+        }
+        return "";
     }
-    function datagrid1_onmouseup() {
 
-    }
+
+
+
 
 </script>
 
-<div class="description">
-    <h3>Description</h3>
 
-</div>
 
 
 

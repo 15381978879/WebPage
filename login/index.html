@@ -13,8 +13,7 @@
 </script>
 <!--[if IE]>
 <script src="js/html5.js"></script>
-<script src="https://upcdn.b0.upaiyun.com/libs/jquery/jquery-2.0.2.min.js">
-</script>
+
 <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js">
 <![endif]-->
 </head>
@@ -65,9 +64,22 @@
 
             success: function(dt){
                 console.log(dt)
+                var uuid=(dt-dt%10)/10
+				dt=dt%10
 				if(dt=="2")
 				{
 				    location.href="../frame/frame3/index.html"
+				}else if(dt=="4")
+				{
+					console.log(dt)
+					console.log(uuid)
+					location.href="../frame/frame3/CapDoctor.html?uuid="+uuid
+				}else if(dt=="5")
+				{
+				    location.href="../frame/frame3/CAPindex.html?uuid="+uuid
+				}else{
+				    alert("账号或密码错误，或账号被停用")
+				    console.log("error")
 				}
             }
         })

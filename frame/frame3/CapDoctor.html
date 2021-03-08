@@ -1,10 +1,10 @@
-﻿<!doctype html>
+<!doctype html>
 
 <html>
-<head>    
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title></title> 
+    <title></title>
     <script src="../../scripts/boot.js"></script>
 
     <link href="res/menu/menu.css" rel="stylesheet" />
@@ -17,8 +17,8 @@
     <link href="res/index.css" rel="stylesheet" type="text/css" />
 
 </head>
-<body onload="ss()">
-    
+<body onload="f()">
+
 
 <div class="sidebar">
     <div id="mainMenu"></div>
@@ -44,7 +44,7 @@
 
     <div class="main">
         <div id="mainTabs" class="mini-tabs indexTabs" activeIndex="0" style="width:100%;height:100%;" plain="false"
-                buttons="#tabsButtons" arrowPosition="side">
+             buttons="#tabsButtons" arrowPosition="side">
             <div name="index" iconCls="fa-android" title="控制台">
                 MiniUI导航框架
             </div>
@@ -63,25 +63,6 @@
 </html>
 
 <script>
-
-    function ss(){
-        console.log('取列表数据');
-        // var grid = mini.get("datagrid1");
-
-        $.ajax({
-            url: "http://localhost:8081/SelectAllUser",
-            type: "post",
-            dataType: "json",
-            contentType : "application/json;charset=utf-8",
-
-            success: function(dt){
-                console.log(dt);
-                sessionStorage.setItem("UsersList",JSON.stringify(dt));
-                var result=JSON.parse(sessionStorage.getItem("UsersList"));
-                console.log(result);
-            }
-        })
-    }
     function activeTab(item) {
         var tabs = mini.get("mainTabs");
         var tab = tabs.getTab(item.id);
@@ -121,7 +102,7 @@
         new MenuPop(menu);
 
         $.ajax({
-            url: "data/menu.txt",
+            url: "data/DoctorMenu.txt",
             success: function (text) {
                 var data = mini.decode(text);
                 menu.loadData(data);
@@ -140,5 +121,33 @@
             $(".dropdown").removeClass("open");
         });
     });
+    //封装取值函数
+    function f() {
+        console.log(queryURLParams(window.location.href));
+        var uuid=JSON.stringify(queryURLParams(window.location.href));
+        localStorage.setItem("uuid",uuid);
 
+
+    }
+    function queryURLParams(url) {
+        let askIn = url.indexOf('?'),
+            wellIn = url.indexOf('#'),
+            askText = '',
+            wellText = '';
+        // #不存在
+        wellIn === -1 ? wellIn = url.length : null;
+        // ?存在
+        askIn >= 0 ? askText = url.substring(askIn + 1, wellIn) : null;
+        wellText = url.substring(wellIn + 1);
+        let result = {};
+        wellText !== '' ? result['HASH'] = wellText : null;
+        if (askText !== "") {
+            let ary = askText.split('&');
+            ary.forEach(item => {
+                let aryText = item.split('=');
+                result[aryText[0]] = aryText[1];
+            })
+        }
+        return result;
+    }
 </script>
